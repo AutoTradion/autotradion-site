@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoTradion | 전략 제출</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
+
+    body {
+      background: #050a0f;
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(5, 10, 15, 0.92);
+      border-bottom: 1px solid #1e2a36;
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-inner {
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00e5ff, #0077ff);
+      box-shadow: 0 0 24px rgba(0, 229, 255, 0.35);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      font-size: 14px;
+      color: #d6e2ef;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover {
+      color: #00e5ff;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 800;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      color: #001018;
+      background: #00e5ff;
+      box-shadow: 0 0 28px rgba(0, 229, 255, 0.28);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      background: #55efff;
+    }
+
+    .btn-outline {
+      color: #00e5ff;
+      border: 2px solid #00e5ff;
+      background: transparent;
+    }
+
+    .btn-outline:hover {
+      background: rgba(0, 229, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .section {
+      padding: 110px 0;
+    }
+
+    .section-title {
+      font-size: clamp(34px, 4vw, 54px);
+      line-height: 1.06;
+      letter-spacing: -0.05em;
+      margin-bottom: 22px;
+    }
+
+    .section-copy {
+      color: #a9b7c6;
+      font-size: 16px;
+      max-width: 650px;
+    }
+
+    .ticker {
+      background: #111a24;
+      border-top: 1px solid #1f2d3a;
+      border-bottom: 1px solid #1f2d3a;
+
+      padding: 28px 0;
+
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .ticker span {
+      display: inline-block;
+      padding-left: 0;
+      white-space: pre;
+    }
+
+    .footer {
+      padding: 70px 0;
+      background: #060b10;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .footer p,
+    .footer a {
+      color: #9fb0c0;
+      font-size: 14px;
+    }
+
+    .socials {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .social-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #101821;
+      border: 1px solid #263544;
+      color: #00e5ff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .contact {
+      text-align: right;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.68);
+      backdrop-filter: blur(10px);
+    }
+
+    .auth-modal.active {
+      display: flex;
+    }
+
+    .auth-box {
+      width: min(420px, 100%);
+      background: #101821;
+      border: 1px solid #00e5ff;
+      border-radius: 22px;
+      padding: 34px;
+      box-shadow: 0 0 40px rgba(0, 229, 255, 0.16);
+      position: relative;
+    }
+
+    .auth-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid #263544;
+      background: #060b10;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .auth-box h2 {
+      font-size: 30px;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin-bottom: 10px;
+    }
+
+    .auth-box p {
+      color: #9fb0c0;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .auth-tab {
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid #263544;
+      background: #060b10;
+      color: #9fb0c0;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .auth-tab.active {
+      border-color: #00e5ff;
+      color: #001018;
+      background: #00e5ff;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .auth-form input {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      border: 1px solid #263544;
+      background: #060b10;
+      color: #ffffff;
+      padding: 0 14px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .auth-form input:focus {
+      border-color: #00e5ff;
+      box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1);
+    }
+
+    .auth-submit {
+      height: 48px;
+      border: 0;
+      border-radius: 999px;
+      background: #00e5ff;
+      color: #001018;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .auth-message {
+      min-height: 20px;
+      margin-top: 14px;
+      color: #9fb8cf;
+      font-size: 13px;
+    }
+
+    .guide-section {
+    padding: 0 0 70px;
+    }
+
+    .guide-box {
+    max-width: 760px;
+    margin: 0 auto;
+    background: #101821;
+    border: 1px solid #243241;
+    border-radius: 20px;
+    padding: 42px;
+    }
+
+    .guide-header {
+    text-align: center;
+    margin-bottom: 36px;
+    }
+
+    .guide-header h2 {
+    font-size: 38px;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    margin-bottom: 14px;
+    }
+
+    .guide-header p {
+    color: #9fb0c0;
+    font-size: 15px;
+    }
+
+    .guide-content {
+    display: grid;
+    gap: 24px;
+    }
+
+    .guide-card {
+    background: #0b131d;
+    border: 1px solid #243241;
+    border-radius: 16px;
+    padding: 28px;
+    }
+
+    .guide-card h3 {
+    font-size: 24px;
+    margin-bottom: 18px;
+    }
+
+    .guide-card p {
+    color: #b5c4d3;
+    line-height: 1.8;
+    font-size: 15px;
+    }
+
+    .guide-highlight {
+    color: #00e5ff;
+    font-weight: 800;
+    }
+
+    .guide-example {
+    margin: 22px 0;
+    padding: 20px;
+    border-radius: 14px;
+    line-height: 1.8;
+    font-size: 14px;
+    }
+
+    .guide-example.good {
+    background: rgba(0, 229, 255, 0.08);
+    border: 1px solid rgba(0, 229, 255, 0.28);
+    }
+
+    .guide-example.bad {
+    background: rgba(255, 80, 80, 0.08);
+    border: 1px solid rgba(255, 80, 80, 0.24);
+    }
+
+
+    /* =========================
+       Submit Page Only
+    ========================= */
+
+    .submit-hero {
+      padding: 96px 0 62px;
+      text-align: center;
+      position: relative;
+    }
+
+    .submit-hero h1 {
+      font-size: clamp(44px, 5vw, 68px);
+      line-height: 1.02;
+      letter-spacing: -0.06em;
+      margin-bottom: 24px;
+    }
+
+    .submit-hero p {
+      color: #a9b7c6;
+      font-size: 17px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .submit-panel {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #101821;
+      border: 1px solid #243241;
+      border-radius: 20px;
+      padding: 54px 38px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+
+    .form-heading {
+      text-align: center;
+      margin-bottom: 34px;
+    }
+
+    .form-heading h2 {
+      font-size: 30px;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin-bottom: 10px;
+    }
+
+    .form-heading p {
+      color: #9fb0c0;
+      font-size: 14px;
+    }
+
+    .strategy-form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .form-field label {
+      color: #d6e2ef;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .strategy-form input,
+    .strategy-form select,
+    .strategy-form textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #263544;
+      background: #060b10;
+      color: #ffffff;
+      padding: 0 14px;
+      outline: none;
+      font-size: 14px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .strategy-form input,
+    .strategy-form select {
+      height: 48px;
+    }
+
+    .strategy-form textarea {
+      min-height: 126px;
+      padding-top: 14px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .strategy-form input:focus,
+    .strategy-form select:focus,
+    .strategy-form textarea:focus {
+      border-color: #00e5ff;
+      box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1);
+    }
+
+    .submit-button {
+      height: 50px;
+      border: 0;
+      border-radius: 999px;
+      background: #00e5ff;
+      color: #001018;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .submit-button:hover {
+      transform: translateY(-2px);
+      background: #55efff;
+    }
+
+    .submit-message {
+      min-height: 20px;
+      margin-top: 2px;
+      color: #9fb8cf;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .process-panel {
+      margin-top: 90px;
+    }
+
+    .process-heading {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+
+    .process-heading h2 {
+      font-size: clamp(34px, 4vw, 54px);
+      line-height: 1.06;
+      letter-spacing: -0.05em;
+      margin-bottom: 22px;
+    }
+
+    .process-heading p {
+      color: #a9b7c6;
+      font-size: 16px;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+    }
+
+    .process-card {
+      background: #101821;
+      border: 1px solid #253343;
+      border-radius: 16px;
+      padding: 24px;
+      transition: 0.2s ease;
+    }
+
+    .process-card:hover {
+      transform: translateY(-4px);
+      border-color: #00e5ff;
+    }
+
+    .process-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(0, 229, 255, 0.1);
+      color: #00e5ff;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      margin-bottom: 18px;
+    }
+
+    .process-card h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .process-card p {
+      color: #a9b7c6;
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+      }
+
+      .footer-grid,
+      .form-row,
+      .process-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contact {
+        text-align: left;
+      }
+
+      .socials {
+        justify-content: flex-start;
+      }
+
+      .submit-panel {
+        padding: 38px 24px;
+      }
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+
+    function forceTop() {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      window.scrollTo(0, 0);
+    }
+
+    forceTop();
+
+    window.addEventListener("DOMContentLoaded", function () {
+      forceTop();
+
+      setTimeout(forceTop, 0);
+      setTimeout(forceTop, 50);
+      setTimeout(forceTop, 150);
+      setTimeout(forceTop, 300);
+    });
+
+    window.addEventListener("load", function () {
+      forceTop();
+
+      setTimeout(forceTop, 0);
+      setTimeout(forceTop, 50);
+      setTimeout(forceTop, 150);
+      setTimeout(forceTop, 300);
+    });
+
+    window.addEventListener("pageshow", function () {
+      forceTop();
+
+      setTimeout(forceTop, 0);
+      setTimeout(forceTop, 50);
+      setTimeout(forceTop, 150);
+      setTimeout(forceTop, 300);
+    });
+  </script>
+</head>
+
+<body>
+  <div class="page">
+    <header class="navbar">
+      <div class="container nav-inner">
+        <a class="logo" href="index.html" aria-label="AutoTradion Home">
+          <span class="logo-mark"></span>
+          <span>AutoTradion</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="index.html#why-autotradion">소개</a>
+          <a href="submit.html" data-protected="true">전략 제출</a>
+          <a href="mypage.html" data-protected="true">마이 페이지</a>
+          <a href="index.html#cases">성공 사례</a>
+          <a href="index.html#products">상품</a>
+          <a href="index.html#contact">문의</a>
+          <a href="#" id="authNavLink">로그인</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="submit-hero">
+        <div class="container">
+          <h1 class="reveal">거래 전략 제출</h1>
+          <p class="reveal">
+            자신만의 거래 전략을 입력하여 AutoTradion의 분석 시스템에 제출하세요.<br />
+            백테스트 결과와 시각화 보고서를 통해 전략의 실전성을 검증할 수 있습니다.
+          </p>
+        </div>
+      </section>
+
+        <section class="guide-section reveal">
+        <div class="guide-box">
+
+            <div class="guide-header">
+            <h2>작성 가이드 & 주의사항</h2>
+
+            <p>
+                보다 정확한 전략 분석을 위해 아래 작성 기준을 반드시 확인해 주세요.
+            </p>
+            </div>
+
+            <div class="guide-content">
+
+            <div class="guide-card">
+                <h3>진입 조건 (Entry Condition)</h3>
+
+                <p>
+                진입 조건은 반드시 <span class="guide-highlight">하나의 진입 로직</span>으로 구성되어야 하며,
+                여러 조건은 <span class="guide-highlight">AND 조건</span>으로만 <br>연결 가능합니다.
+                </p>
+
+                <div class="guide-example good">
+                ✅ 옳은 예시<br><br>
+
+                “볼린저 밴드 [20(Length), 2(Multiplier)] 바깥에서 종가가 형성되고,
+                RSI가 30 이하일 경우 롱 진입”
+                </div>
+
+                <div class="guide-example bad">
+                ❌ 불가능한 예시<br><br>
+
+                “볼린저 밴드 밖에서 롱 진입”<br>
+                OR<br>
+                “RSI 과매도일 때 롱 진입”
+                </div>
+
+                <p>
+                위와 같은 OR 구조는 서로 다른 전략을 동시에 테스트하는 형태가 되므로<br>
+                하나의 전략으로 분석하기에 어려움이 있습니다.
+                </p>
+            </div>
+
+            <div class="guide-card">
+                <h3>진입 필터 (Entry Filter)</h3>
+
+                <p>
+                진입 필터는 거래량, 세션, 추세 방향, 상위 타임프레임 구조 등
+                전략의 정확도를 높이기 위한 <br>보조 조건입니다.
+                </p>
+
+                <p>
+                필터는 여러 종류를 자유롭게 조합할 수 있으며,
+                개수 제한 없이 작성 가능합니다.
+                </p>
+            </div>
+
+            <div class="guide-card">
+                <h3>구체적 작성</h3>
+
+                <p>
+                정확한 전략 분석을 위해,<br>
+                진입 조건 및 진입 필터는 반드시 수치 기반의 명확한 조건으로 작성해 주세요.
+                </p>
+
+                <div class="guide-example good">
+                ✅ 옳은 예시<br><br>
+
+                “RSI 14(Length)의 값 > RSI 30(Length)의 값의 조건을 만족했을 때 롱 진입”
+                </div>
+
+                <div class="guide-example bad">
+                ❌ 불가능한 예시<br><br>
+
+                “RSI 골든크로스 발생 시 롱 진입”
+                </div>
+
+                <p>
+                전략 조건을 수치적으로 정의하기 어려운 경우,<br>
+                가능한 한 구체적으로 매매 전략을 작성해 주세요.<br><br>
+
+                전략 분석 과정에서 추가적으로 필요한 정보가 있을 경우,<br>
+                AutoTradion 측에서 정리된 질문 형태로 안내 메일을 발송해드립니다.<br><br>
+
+                추가 요청 사항에 대한 답변이 완료되면,<br>
+                이후 본격적인 전략 분석 및 백테스트가 진행됩니다.
+                </p>
+            </div>
+
+            </div>
+        </div>
+        </section>
+
+
+
+      <section class="section" style="padding-top: 0;">
+        <div class="container">
+          <div class="submit-panel reveal">
+            <div class="form-heading">
+              <h2>전략 입력 양식</h2>
+              <p>전략 조건이 구체적일수록 더 정확한 분석이 가능합니다.<br> ( * 표시는 필수 입력란입니다. )
+              </p>
+            </div>
+
+            <form class="strategy-form" id="strategyForm">
+
+
+                <div class="form-field">
+                <label for="productOption">상품 옵션 *</label>
+                <select id="productOption" required>
+                    <option value="">선택하세요</option>
+                    <option value="A. Core">A. Core</option>
+                    <option value="B. Pro">B. Pro</option>
+                    <option value="C. Signal">C. Signal</option>
+                    <option value="D. Elite">D. Elite</option>
+                </select>
+                </div>
+
+
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="strategyName">거래 전략 이름 *</label>
+                  <input id="strategyName" type="text" placeholder="예: BTC RSI Divergence Strategy" required />
+                </div>
+
+                <div class="form-field">
+                  <label for="market">거래 대상 자산 *</label>
+                  <input id="market" type="text" placeholder="예: BTCUSDT.P / ETHUSDT / NVDA" required />
+                </div>
+
+              </div>
+
+
+
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="TimeFrame">타임 프레임 *</label>
+                  <input id="tradeType" type="text" placeholder="예: 1W / 1D / 4H / 15M" required />
+                </div> 
+                <div class="form-field">
+                  <label for="LongShort">매매 방향 *</label>
+                  <select id="tradeDirection" required>
+                      <option value="">선택하세요</option>
+                      <option value="Long">롱(상승)</option>
+                      <option value="Short">숏(하락)</option>
+                      <option value="Either">양방향</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="entryCondition">전략 설명 *</label>
+                <textarea id="entryCondition" placeholder="매매 전략에 대한 설명을 간단히 적어주세요." required></textarea>
+              </div>
+
+              <div class="form-field">
+                <label for="volumeCondition">진입 조건 *</label>
+                <textarea id="volumeCondition" placeholder="진입 조건을 입력해 주세요. (단일 로직, AND 조건만 가능)" required></textarea>
+              </div>
+
+                <div class="form-field">
+                <label for="entryFilter">진입 필터 *</label>
+                <textarea id="entryFilter" placeholder="진입 필터를 입력해 주세요. (복수 조건 가능)" required></textarea>
+                </div>
+
+                <div class="form-field">
+                <label for="stopLoss">Stop Loss</label>
+                <textarea id="stopLoss" placeholder="리스크 종료 조건은 가격 구조, 변동성 기준, 지표 조건 등 전략 기준에 맞춰 구체적으로 작성해 주세요."></textarea>
+                </div>
+
+                <div class="form-field">
+                <label for="takeProfit">Take Profit</label>
+                <textarea id="takeProfit" placeholder="수익 실현 조건은 목표가, 구조 기반 청산, 분할 청산 등 전략 기준에 맞춰 구체적으로 작성해 주세요."></textarea>
+                </div>
+
+                <div class="form-field">
+                <label for="positionManagement">포지션 관리</label>
+                <textarea id="positionManagement" placeholder="포지션 관리 항목에는 리스크 비율, 레버리지 제한, 분할 진입, 손실 제한, 동시 포지션 관리 조건 등 실제 운용 기준을 상세하게 작성해 주세요."></textarea>
+                </div>
+
+                <div class="form-field">
+                <label for="additionalRequest">추가 요청</label>
+                <textarea id="additionalRequest" placeholder="전략 분석에 참고할 추가 정보가 있다면 자유롭게 작성해 주세요."></textarea>
+                </div>
+
+              <button class="submit-button" id="strategySubmit" type="submit">제출</button>
+              <div class="submit-message" id="submitMessage"></div>
+            </form>
+          </div>
+
+          <div class="process-panel">
+            <div class="process-heading reveal">
+              <h2>분석 프로세스 안내</h2>
+              <p>
+                제출된 전략은 조건 정리, 백테스트, 리스크 분석, 보고서 생성 순서로 검토됩니다.
+              </p>
+            </div>
+
+            <div class="process-grid">
+              <article class="process-card reveal">
+                <div class="process-icon">📄</div>
+                <h3>전략 제출</h3>
+                <p>진입 조건, 필터, TP/SL, 거래 방식 등 핵심 로직을 정리합니다.</p>
+              </article>
+
+              <article class="process-card reveal">
+                <div class="process-icon">⚙️</div>
+                <h3>조건 구현</h3>
+                <p>제출된 자연어 전략을 백테스트 가능한 코드 구조로 변환합니다.</p>
+              </article>
+
+              <article class="process-card reveal">
+                <div class="process-icon">📊</div>
+                <h3>백테스트 분석</h3>
+                <p>승률, 기대값, 손익비, MDD, 진입 품질 등을 데이터로 검증합니다.</p>
+              </article>
+
+              <article class="process-card reveal">
+                <div class="process-icon">🧾</div>
+                <h3>리포트 제공</h3>
+                <p>전략의 강점, 약점, 개선 방향을 분석 보고서 형태로 제공합니다.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="ticker" aria-hidden="true">
+        <span>로직 정밀도        •        실시간 백테스트        •        전문 보고서        •        자동매매 구성        •        자동신호 프로그램        •        전략 분석</span>
+      </div>
+    </main>
+
+    <footer class="footer" id="contact">
+      <div class="container footer-grid">
+        <div>
+          <a class="logo" href="index.html">
+            <span class="logo-mark"></span>
+            <span>AutoTradion</span>
+          </a>
+          <p style="margin-top: 28px;">Trade Smarter, Analyze Faster</p>
+          <p style="margin-top: 34px;">© 2026 AutoTradion. All rights reserved.</p>
+        </div>
+
+        <div class="socials" aria-label="Social links">
+          <a class="social-dot" href="#">F</a>
+          <a class="social-dot" href="#">I</a>
+          <a class="social-dot" href="#">Y</a>
+          <a class="social-dot" href="#">X</a>
+          <a class="social-dot" href="#">IN</a>
+        </div>
+
+        <div class="contact">
+          <p>contact@autotradion.io</p>
+          <p style="margin-top: 26px;">서울, 한국</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div class="auth-modal" id="authModal" aria-hidden="true">
+    <div class="auth-box">
+      <button class="auth-close" id="authClose" type="button" aria-label="Close login modal">×</button>
+
+      <h2 id="authTitle">로그인</h2>
+      <p id="authDesc">AutoTradion 서비스를 이용하려면 로그인이 필요합니다.</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="loginTab" type="button">로그인</button>
+        <button class="auth-tab" id="signupTab" type="button">회원가입</button>
+      </div>
+
+      <form class="auth-form" id="authForm">
+        <input id="authEmail" type="email" placeholder="이메일" autocomplete="email" required />
+        <input id="authPassword" type="password" placeholder="비밀번호" autocomplete="current-password" required />
+        <button class="auth-submit" id="authSubmit" type="submit">로그인</button>
+      </form>
+
+      <div class="auth-message" id="authMessage"></div>
+    </div>
+  </div>
+
+  <script>
+    const revealElements = document.querySelectorAll(".reveal");
+
+    function revealOnScroll() {
+      revealElements.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+
+        if (rect.top < windowHeight - 80) {
+          el.classList.add("active");
+        }
+      });
+    }
+
+    window.addEventListener("scroll", revealOnScroll);
+    window.addEventListener("load", revealOnScroll);
+    window.addEventListener("pageshow", revealOnScroll);
+
+    revealOnScroll();
+  </script>
+
+  <script>
+    const SUPABASE_URL = "https://ygcwsnvwwadprfagxyqv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable__yFeMAX8nVt3Ul3TbsaiIw_oQh0_XSZ";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const authModal = document.getElementById("authModal");
+    const authClose = document.getElementById("authClose");
+    const authNavLink = document.getElementById("authNavLink");
+    const loginTab = document.getElementById("loginTab");
+    const signupTab = document.getElementById("signupTab");
+    const authTitle = document.getElementById("authTitle");
+    const authDesc = document.getElementById("authDesc");
+    const authForm = document.getElementById("authForm");
+    const authEmail = document.getElementById("authEmail");
+    const authPassword = document.getElementById("authPassword");
+    const authSubmit = document.getElementById("authSubmit");
+    const authMessage = document.getElementById("authMessage");
+
+    const strategyForm = document.getElementById("strategyForm");
+    const strategySubmit = document.getElementById("strategySubmit");
+    const submitMessage = document.getElementById("submitMessage");
+
+    let authMode = "login";
+    let currentUser = null;
+
+    function openAuthModal(message = "") {
+      authModal.classList.add("active");
+      authModal.setAttribute("aria-hidden", "false");
+      authMessage.textContent = message;
+      setTimeout(() => authEmail.focus(), 50);
+    }
+
+    function closeAuthModal() {
+      authModal.classList.remove("active");
+      authModal.setAttribute("aria-hidden", "true");
+      authMessage.textContent = "";
+      authForm.reset();
+    }
+
+    function setAuthMode(mode) {
+      authMode = mode;
+      const isLogin = mode === "login";
+
+      loginTab.classList.toggle("active", isLogin);
+      signupTab.classList.toggle("active", !isLogin);
+
+      authTitle.textContent = isLogin ? "로그인" : "회원가입";
+      authDesc.textContent = isLogin
+        ? "AutoTradion 서비스를 이용하려면 로그인이 필요합니다."
+        : "이메일과 비밀번호로 AutoTradion 계정을 생성합니다.";
+      authSubmit.textContent = isLogin ? "로그인" : "회원가입";
+      authMessage.textContent = "";
+    }
+
+    function updateAuthUI(user) {
+      currentUser = user;
+
+      if (user) {
+        authNavLink.textContent = "로그아웃";
+        authNavLink.href = "#logout";
+      } else {
+        authNavLink.textContent = "로그인";
+        authNavLink.href = "#login";
+      }
+    }
+
+    async function initAuth() {
+      const { data } = await supabaseClient.auth.getSession();
+      updateAuthUI(data.session?.user ?? null);
+
+      if (!data.session?.user) {
+        alert("로그인이 필요한 서비스입니다. 로그인 후 이용해 주세요.");
+        window.location.href = "index.html";
+      }
+    }
+
+    loginTab.addEventListener("click", () => setAuthMode("login"));
+    signupTab.addEventListener("click", () => setAuthMode("signup"));
+    authClose.addEventListener("click", closeAuthModal);
+
+    authModal.addEventListener("click", (e) => {
+      if (e.target === authModal) closeAuthModal();
+    });
+
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = authEmail.value.trim();
+      const password = authPassword.value.trim();
+
+      if (!email || !password) {
+        authMessage.textContent = "이메일과 비밀번호를 입력해 주세요.";
+        return;
+      }
+
+      authSubmit.disabled = true;
+      authSubmit.textContent = authMode === "login" ? "로그인 중..." : "가입 중...";
+      authMessage.textContent = "";
+
+      try {
+        if (authMode === "login") {
+          const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (error) throw error;
+
+          updateAuthUI(data.user);
+          closeAuthModal();
+          alert("로그인되었습니다.");
+        } else {
+          const { data, error } = await supabaseClient.auth.signUp({
+            email,
+            password,
+          });
+
+          if (error) throw error;
+
+          if (data.user && data.session) {
+            updateAuthUI(data.user);
+            closeAuthModal();
+            alert("회원가입이 완료되었습니다.");
+          } else {
+            authMessage.textContent = "회원가입이 완료되었습니다. 이메일 인증을 확인해 주세요.";
+          }
+        }
+      } catch (error) {
+        authMessage.textContent = error.message || "처리 중 오류가 발생했습니다.";
+      } finally {
+        authSubmit.disabled = false;
+        authSubmit.textContent = authMode === "login" ? "로그인" : "회원가입";
+      }
+    });
+
+    authNavLink.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      if (currentUser) {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) {
+          alert("로그아웃 중 오류가 발생했습니다.");
+          return;
+        }
+        updateAuthUI(null);
+        alert("로그아웃되었습니다.");
+        window.location.href = "index.html";
+      } else {
+        setAuthMode("login");
+        openAuthModal();
+      }
+    });
+
+    strategyForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!currentUser) {
+        submitMessage.textContent = "로그인이 필요합니다.";
+        return;
+      }
+
+      strategySubmit.disabled = true;
+      strategySubmit.textContent = "제출 중...";
+      submitMessage.textContent = "";
+
+      const payload = {
+        user_id: currentUser.id,
+        email: currentUser.email,
+        product_option: document.getElementById("productOption").value,
+        strategy_name: document.getElementById("strategyName").value.trim(),
+        market: document.getElementById("market").value.trim(),
+        trade_type: document.getElementById("tradeType").value.trim(),
+        trade_direction: document.getElementById("tradeDirection").value,
+        strategy_description: document.getElementById("entryCondition").value.trim(),
+        entry_condition: document.getElementById("volumeCondition").value.trim(),
+        entry_filter: document.getElementById("entryFilter").value.trim(),
+        stop_loss: document.getElementById("stopLoss").value.trim(),
+        take_profit: document.getElementById("takeProfit").value.trim(),
+        position_management: document.getElementById("positionManagement").value.trim(),
+        additional_request: document.getElementById("additionalRequest").value.trim(),
+      };
+
+      const { error } = await supabaseClient
+        .from("strategy_submissions")
+        .insert([payload]);
+
+      if (error) {
+        console.error(error);
+        submitMessage.textContent = "제출 중 오류가 발생했습니다.";
+        strategySubmit.disabled = false;
+        strategySubmit.textContent = "제출";
+        return;
+      }
+
+      submitMessage.textContent = "전략이 성공적으로 제출되었습니다.";
+      strategyForm.reset();
+
+      strategySubmit.disabled = false;
+      strategySubmit.textContent = "제출";
+    });
+
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
+      updateAuthUI(session?.user ?? null);
+    });
+
+    initAuth();
+  </script>
+</body>
+</html>

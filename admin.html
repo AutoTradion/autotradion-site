@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoTradion | Admin</title>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #050a0f;
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .page { width: 100%; overflow: hidden; }
+
+    .container {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(5, 10, 15, 0.92);
+      border-bottom: 1px solid #1e2a36;
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-inner {
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00e5ff, #0077ff);
+      box-shadow: 0 0 24px rgba(0, 229, 255, 0.35);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      font-size: 14px;
+      color: #d6e2ef;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover { color: #00e5ff; }
+
+    .admin-hero {
+      padding: 96px 0 48px;
+      text-align: center;
+    }
+
+    .admin-hero h1 {
+      font-size: clamp(44px, 5vw, 68px);
+      line-height: 1.02;
+      letter-spacing: -0.06em;
+      margin-bottom: 24px;
+    }
+
+    .admin-hero p {
+      color: #a9b7c6;
+      font-size: 17px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .section { padding: 60px 0 110px; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .summary-card,
+    .dashboard-panel,
+    .detail-box,
+    .submission-card {
+      background: #101821;
+      border: 1px solid #243241;
+      border-radius: 20px;
+    }
+
+    .summary-card { padding: 22px; }
+
+    .summary-label {
+      color: #8fa3b5;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .summary-value {
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .dashboard-panel { padding: 34px; }
+
+    .panel-title {
+      font-size: 26px;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin-bottom: 10px;
+    }
+
+    .panel-copy {
+      color: #9fb0c0;
+      font-size: 14px;
+      margin-bottom: 26px;
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #263544;
+      background: #060b10;
+      color: #ffffff;
+      padding: 0 14px;
+      outline: none;
+      font-size: 14px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    input, select { height: 46px; }
+
+    textarea {
+      min-height: 150px;
+      padding-top: 14px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #00e5ff;
+      box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1);
+    }
+
+    .submission-list {
+      display: grid;
+      gap: 14px;
+      max-height: 760px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .submission-card {
+      background: #060b10;
+      padding: 20px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .submission-card:hover,
+    .submission-card.active {
+      transform: translateY(-2px);
+      border-color: #00e5ff;
+    }
+
+    .submission-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .submission-top h3 {
+      font-size: 19px;
+      line-height: 1.25;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: rgba(0, 229, 255, 0.1);
+      color: #00e5ff;
+      border: 1px solid rgba(0, 229, 255, 0.26);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .submission-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      color: #9fb0c0;
+      font-size: 13px;
+    }
+
+    .detail-empty {
+      color: #9fb0c0;
+      background: #060b10;
+      border: 1px dashed #263544;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .detail-section {
+      display: grid;
+      gap: 16px;
+    }
+
+    .detail-box {
+      background: #060b10;
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .detail-box h3 {
+      font-size: 15px;
+      color: #00e5ff;
+      margin-bottom: 8px;
+    }
+
+    .detail-box p {
+      color: #d6e2ef;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .admin-actions {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .save-button {
+      height: 48px;
+      border: 0;
+      border-radius: 999px;
+      background: #00e5ff;
+      color: #001018;
+      font-weight: 900;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .save-button:hover {
+      transform: translateY(-2px);
+      background: #55efff;
+    }
+
+    .admin-message {
+      min-height: 20px;
+      color: #9fb8cf;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .ticker {
+      background: #111a24;
+      border-top: 1px solid #1f2d3a;
+      border-bottom: 1px solid #1f2d3a;
+      padding: 28px 0;
+      font-size: 20px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .ticker span {
+      white-space: pre;
+    }
+
+    .footer {
+      padding: 70px 0;
+      background: #060b10;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 40px;
+    }
+
+    .footer p, .footer a {
+      color: #9fb0c0;
+      font-size: 14px;
+    }
+
+    .socials {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .social-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #101821;
+      border: 1px solid #263544;
+      color: #00e5ff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .contact { text-align: right; }
+
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+
+      .dashboard-grid,
+      .summary-grid,
+      .detail-grid,
+      .footer-grid,
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+
+      .contact { text-align: left; }
+      .socials { justify-content: flex-start; }
+      .submission-top { display: grid; }
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <div class="page">
+    <header class="navbar">
+      <div class="container nav-inner">
+        <a class="logo" href="index.html">
+          <span class="logo-mark"></span>
+          <span>AutoTradion</span>
+        </a>
+
+        <nav class="nav-links">
+          <a href="index.html#why-autotradion">소개</a>
+          <a href="submit.html">전략 제출</a>
+          <a href="mypage.html">마이 페이지</a>
+          <a href="index.html#products">상품</a>
+          <a href="index.html#contact">문의</a>
+          <a href="#" id="authNavLink">로그아웃</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="admin-hero">
+        <div class="container">
+          <h1>관리자 페이지</h1>
+          <p>제출된 거래 전략을 확인하고, 분석 상태·파일·리플레이 데이터를 관리합니다.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">전체 제출</div>
+              <div class="summary-value" id="totalCount">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">신규 접수</div>
+              <div class="summary-value" id="newCount">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">분석중</div>
+              <div class="summary-value" id="workingCount">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">완료</div>
+              <div class="summary-value" id="doneCount">0</div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="dashboard-panel">
+              <h2 class="panel-title">제출 목록</h2>
+              <p class="panel-copy">고객이 제출한 전략을 최신순으로 확인합니다.</p>
+
+              <div class="filter-row">
+                <input id="searchInput" type="text" placeholder="전략명 / 이메일 / 자산 검색" />
+                <select id="statusFilter">
+                  <option value="">전체 상태</option>
+                  <option value="접수 완료">접수 완료</option>
+                  <option value="확인중">확인중</option>
+                  <option value="추가 정보 요청">추가 정보 요청</option>
+                  <option value="분석중">분석중</option>
+                  <option value="완료">완료</option>
+                </select>
+              </div>
+
+              <div class="submission-list" id="submissionList">
+                <div class="detail-empty">제출 데이터를 불러오는 중입니다.</div>
+              </div>
+            </div>
+
+            <div class="dashboard-panel">
+              <h2 class="panel-title">상세 내용</h2>
+              <p class="panel-copy">선택한 전략의 전체 제출 내용을 확인하고 결과물을 관리합니다.</p>
+
+              <div id="detailView">
+                <div class="detail-empty">왼쪽 목록에서 전략을 선택해 주세요.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="ticker" aria-hidden="true">
+        <span>로직 정밀도        •        실시간 백테스트        •        전문 보고서        •        자동매매 구성        •        자동신호 프로그램        •        전략 분석</span>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="logo" href="index.html">
+            <span class="logo-mark"></span>
+            <span>AutoTradion</span>
+          </a>
+          <p style="margin-top: 28px;">Trade Smarter, Analyze Faster</p>
+          <p style="margin-top: 34px;">© 2026 AutoTradion. All rights reserved.</p>
+        </div>
+
+        <div class="socials">
+          <a class="social-dot" href="#">F</a>
+          <a class="social-dot" href="#">I</a>
+          <a class="social-dot" href="#">Y</a>
+          <a class="social-dot" href="#">X</a>
+          <a class="social-dot" href="#">IN</a>
+        </div>
+
+        <div class="contact">
+          <p>contact@autotradion.io</p>
+          <p style="margin-top: 26px;">서울, 한국</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://ygcwsnvwwadprfagxyqv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable__yFeMAX8nVt3Ul3TbsaiIw_oQh0_XSZ";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const ADMIN_EMAILS = [
+      "lew06130@gmail.com"
+    ];
+
+    const READY_PENDING = "준비 중";
+    const READY_DONE = "준비 완료";
+
+    const authNavLink = document.getElementById("authNavLink");
+    const submissionList = document.getElementById("submissionList");
+    const detailView = document.getElementById("detailView");
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+
+    const totalCount = document.getElementById("totalCount");
+    const newCount = document.getElementById("newCount");
+    const workingCount = document.getElementById("workingCount");
+    const doneCount = document.getElementById("doneCount");
+
+    let currentUser = null;
+    let submissions = [];
+    let selectedId = null;
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "-";
+
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, "0");
+      const dd = String(date.getDate()).padStart(2, "0");
+      const hh = String(date.getHours()).padStart(2, "0");
+      const mi = String(date.getMinutes()).padStart(2, "0");
+
+      return `${yyyy}.${mm}.${dd} ${hh}:${mi}`;
+    }
+
+    function normalizeReadyStatus(value) {
+      if (value === "준비완료") return READY_DONE;
+      if (value === "준비중") return READY_PENDING;
+      return value || READY_PENDING;
+    }
+
+    function getFilteredSubmissions() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const status = statusFilter.value;
+
+      return submissions.filter((item) => {
+        const text = [
+          item.email,
+          item.strategy_name,
+          item.market,
+          item.product_option,
+          item.trade_type,
+          item.trade_direction
+        ].join(" ").toLowerCase();
+
+        return (!keyword || text.includes(keyword)) && (!status || item.status === status);
+      });
+    }
+
+    function renderStats() {
+      totalCount.textContent = submissions.length;
+      newCount.textContent = submissions.filter((item) => item.status === "접수 완료").length;
+      workingCount.textContent = submissions.filter((item) => item.status === "분석중").length;
+      doneCount.textContent = submissions.filter((item) => item.status === "준비 완료").length;
+    }
+
+    function renderList() {
+      const filtered = getFilteredSubmissions();
+
+      if (!filtered.length) {
+        submissionList.innerHTML = `<div class="detail-empty">표시할 제출 데이터가 없습니다.</div>`;
+        return;
+      }
+
+      submissionList.innerHTML = filtered.map((item) => {
+        const activeClass = item.id === selectedId ? "active" : "";
+
+        return `
+          <article class="submission-card ${activeClass}" data-id="${escapeHtml(item.id)}">
+            <div class="submission-top">
+              <h3>${escapeHtml(item.strategy_name || "이름 없는 전략")}</h3>
+              <span class="status-badge">${escapeHtml(item.status || "접수 완료")}</span>
+            </div>
+
+            <div class="submission-meta">
+              <div>이메일: ${escapeHtml(item.email || "-")}</div>
+              <div>상품: ${escapeHtml(item.product_option || "-")}</div>
+              <div>자산: ${escapeHtml(item.market || "-")}</div>
+              <div>제출일: ${escapeHtml(formatDate(item.created_at))}</div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".submission-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          selectedId = card.dataset.id;
+          renderList();
+          renderDetail();
+        });
+      });
+    }
+
+    function renderDetail() {
+      const item = submissions.find((submission) => submission.id === selectedId);
+
+      if (!item) {
+        detailView.innerHTML = `<div class="detail-empty">왼쪽 목록에서 전략을 선택해 주세요.</div>`;
+        return;
+      }
+
+      const pdfStatus = normalizeReadyStatus(item.pdf_status);
+      const csvStatus = normalizeReadyStatus(item.csv_status);
+      const replayStatus = normalizeReadyStatus(item.replay_status);
+
+      detailView.innerHTML = `
+        <div class="detail-section">
+          <div class="detail-grid">
+            <div class="detail-box">
+              <h3>고객 이메일</h3>
+              <p>${escapeHtml(item.email || "-")}</p>
+            </div>
+
+            <div class="detail-box">
+              <h3>제출일</h3>
+              <p>${escapeHtml(formatDate(item.created_at))}</p>
+            </div>
+
+            <div class="detail-box">
+              <h3>상품 옵션</h3>
+              <p>${escapeHtml(item.product_option || "-")}</p>
+            </div>
+
+            <div class="detail-box">
+              <h3>거래 대상</h3>
+              <p>${escapeHtml(item.market || "-")}</p>
+            </div>
+
+            <div class="detail-box">
+              <h3>타임 프레임</h3>
+              <p>${escapeHtml(item.trade_type || "-")}</p>
+            </div>
+
+            <div class="detail-box">
+              <h3>매매 방향</h3>
+              <p>${escapeHtml(item.trade_direction || "-")}</p>
+            </div>
+          </div>
+
+          <div class="detail-box">
+            <h3>전략 이름</h3>
+            <p>${escapeHtml(item.strategy_name || "-")}</p>
+          </div>
+
+          <div class="detail-box">
+            <h3>전략 설명</h3>
+            <p>${escapeHtml(item.strategy_description || "-")}</p>
+          </div>
+
+          <div class="detail-box">
+            <h3>진입 조건</h3>
+            <p>${escapeHtml(item.entry_condition || "-")}</p>
+          </div>
+
+          <div class="detail-box">
+            <h3>진입 필터</h3>
+            <p>${escapeHtml(item.entry_filter || "-")}</p>
+          </div>
+
+          <div class="detail-box">
+            <h3>Stop Loss</h3>
+            <p>${escapeHtml(item.stop_loss || "-")}</p>
+          </div>
+
+          <div class="detail-box">
+            <h3>Take Profit</h3>
+            <p>${escapeHtml(item.take_profit || "-")}</p>
+          </div>
+
+          <div class="detail-box">
+            <h3>포지션 관리</h3>
+            <p>${escapeHtml(item.position_management || "-")}</p>
+          </div>
+
+          <div class="detail-box">
+            <h3>추가 요청</h3>
+            <p>${escapeHtml(item.additional_request || "-")}</p>
+          </div>
+
+          <div class="admin-actions">
+            <select id="adminStatus">
+              <option value="접수 완료">접수 완료</option>
+              <option value="확인중">확인중</option>
+              <option value="추가 정보 요청">추가 정보 요청</option>
+              <option value="분석중">분석중</option>
+              <option value="준비 완료">준비 완료</option>
+            </select>
+
+            <textarea id="adminMemo" placeholder="관리자 메모를 입력하세요.">${escapeHtml(item.admin_memo || "")}</textarea>
+
+            <div class="detail-box">
+              <h3>PDF 분석 리포트</h3>
+              <select id="pdfStatus">
+                <option value="준비 중">준비 중</option>
+                <option value="준비 완료">준비 완료</option>
+              </select>
+              <input id="pdfFile" type="file" accept=".pdf" style="margin-top: 12px;" />
+              <p style="margin-top: 10px;">현재 파일: ${escapeHtml(item.pdf_file_url || "없음")}</p>
+              <button class="save-button" id="deletePdfButton" type="button" style="margin-top: 12px;">PDF 파일 삭제</button>
+            </div>
+
+            <div class="detail-box">
+              <h3>CSV 백테스트 데이터</h3>
+              <select id="csvStatus">
+                <option value="준비 중">준비 중</option>
+                <option value="준비 완료">준비 완료</option>
+              </select>
+              <input id="csvFile" type="file" accept=".csv" style="margin-top: 12px;" />
+              <p style="margin-top: 10px;">현재 파일: ${escapeHtml(item.csv_file_url || "없음")}</p>
+              <button class="save-button" id="deleteCsvButton" type="button" style="margin-top: 12px;">CSV 파일 삭제</button>
+            </div>
+
+            <div class="detail-box">
+              <h3>리플레이 보기</h3>
+              <select id="replayStatus">
+                <option value="준비 중">준비 중</option>
+                <option value="준비 완료">준비 완료</option>
+              </select>
+
+              <input id="replayCandlesFile" type="file" accept=".csv" style="margin-top: 12px;" />
+              <p style="margin-top: 10px;">현재 캔들 파일: ${escapeHtml(item.replay_candles_url || "없음")}</p>
+              <button class="save-button" id="deleteReplayCandlesButton" type="button" style="margin-top: 12px;">리플레이 캔들 파일 삭제</button>
+
+              <textarea id="replayLogicCode" placeholder="리플레이에 사용할 전략 로직 코드 또는 설명을 입력하세요." style="margin-top: 12px;">${escapeHtml(item.replay_logic_code || "")}</textarea>
+
+              <button class="save-button" id="openReplayButton" type="button" style="margin-top: 12px;">리플레이 보기</button>
+            </div>
+
+            <button class="save-button" id="saveAdminButton" type="button">상태 / 파일 / 메모 저장</button>
+            <div class="admin-message" id="adminMessage"></div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("adminStatus").value = item.status || "접수 완료";
+      document.getElementById("pdfStatus").value = pdfStatus;
+      document.getElementById("csvStatus").value = csvStatus;
+      document.getElementById("replayStatus").value = replayStatus;
+
+      document.getElementById("saveAdminButton").addEventListener("click", saveAdminUpdate);
+
+      document.getElementById("deletePdfButton").addEventListener("click", () => {
+        deleteStrategyFile(item, "pdf_file_url", "pdf_status");
+      });
+
+      document.getElementById("deleteCsvButton").addEventListener("click", () => {
+        deleteStrategyFile(item, "csv_file_url", "csv_status");
+      });
+
+      document.getElementById("deleteReplayCandlesButton").addEventListener("click", () => {
+        deleteStrategyFile(item, "replay_candles_url", "replay_status");
+      });
+
+      document.getElementById("openReplayButton").addEventListener("click", () => {
+        window.open(`replay.html?id=${item.id}`, "_blank");
+      });
+    }
+
+    async function uploadStrategyFile(item, fileInputId, folderName) {
+      const fileInput = document.getElementById(fileInputId);
+      const file = fileInput?.files?.[0];
+
+      if (!file) return null;
+
+      const safeName = file.name.replaceAll(" ", "_");
+      const filePath = `${item.user_id}/${item.id}/${folderName}/${Date.now()}_${safeName}`;
+
+      const { error } = await supabaseClient.storage
+        .from("strategy-files")
+        .upload(filePath, file, { upsert: true });
+
+      if (error) throw error;
+
+      return filePath;
+    }
+
+    async function deleteStrategyFile(item, fileColumn, statusColumn) {
+      const filePath = item[fileColumn];
+
+      if (!filePath) {
+        alert("삭제할 파일이 없습니다.");
+        return;
+      }
+
+      const confirmed = confirm("정말 이 파일을 삭제할까요?");
+      if (!confirmed) return;
+
+      try {
+        const { error: storageError } = await supabaseClient.storage
+          .from("strategy-files")
+          .remove([filePath]);
+
+        if (storageError) throw storageError;
+
+        const { error: dbError } = await supabaseClient
+          .from("strategy_submissions")
+          .update({
+            [fileColumn]: null,
+            [statusColumn]: "준비 중"
+          })
+          .eq("id", item.id);
+
+        if (dbError) throw dbError;
+
+        alert("파일이 삭제되었습니다.");
+        await loadSubmissions();
+      } catch (error) {
+        console.error(error);
+        alert("파일 삭제 중 오류가 발생했습니다. Storage delete 정책을 확인해 주세요.");
+      }
+    }
+
+
+    async function saveAdminUpdate() {
+      const item = submissions.find((submission) => submission.id === selectedId);
+      if (!item) return;
+
+      const saveButton = document.getElementById("saveAdminButton");
+      const adminMessage = document.getElementById("adminMessage");
+
+      const status = document.getElementById("adminStatus").value;
+      const adminMemo = document.getElementById("adminMemo").value.trim();
+
+      const pdfStatus = document.getElementById("pdfStatus").value;
+      const csvStatus = document.getElementById("csvStatus").value;
+      const replayStatus = document.getElementById("replayStatus").value;
+      const replayLogicCode = document.getElementById("replayLogicCode").value.trim();
+
+      saveButton.disabled = true;
+      saveButton.textContent = "저장 중...";
+      adminMessage.textContent = "";
+
+      try {
+        const uploadedPdfPath = await uploadStrategyFile(item, "pdfFile", "pdf");
+        const uploadedCsvPath = await uploadStrategyFile(item, "csvFile", "csv");
+        const uploadedReplayCandlesPath = await uploadStrategyFile(item, "replayCandlesFile", "replay");
+
+        const updatePayload = {
+          status,
+          admin_memo: adminMemo,
+          pdf_status: pdfStatus,
+          csv_status: csvStatus,
+          replay_status: replayStatus,
+          replay_logic_code: replayLogicCode
+        };
+
+        if (uploadedPdfPath) updatePayload.pdf_file_url = uploadedPdfPath;
+        if (uploadedCsvPath) updatePayload.csv_file_url = uploadedCsvPath;
+        if (uploadedReplayCandlesPath) updatePayload.replay_candles_url = uploadedReplayCandlesPath;
+
+        const { error } = await supabaseClient
+          .from("strategy_submissions")
+          .update(updatePayload)
+          .eq("id", item.id);
+
+        if (error) throw error;
+
+        adminMessage.textContent = "저장되었습니다.";
+        saveButton.disabled = false;
+        saveButton.textContent = "상태 / 파일 / 메모 저장";
+
+        await loadSubmissions();
+      } catch (error) {
+        console.error(error);
+        adminMessage.textContent = "저장 중 오류가 발생했습니다. Storage 정책 또는 RLS 정책을 확인해 주세요.";
+        saveButton.disabled = false;
+        saveButton.textContent = "상태 / 파일 / 메모 저장";
+      }
+    }
+
+    async function loadSubmissions() {
+      submissionList.innerHTML = `<div class="detail-empty">제출 데이터를 불러오는 중입니다.</div>`;
+
+      const { data, error } = await supabaseClient
+        .from("strategy_submissions")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        submissionList.innerHTML = `<div class="detail-empty">데이터를 불러오지 못했습니다. RLS 정책을 확인해 주세요.</div>`;
+        return;
+      }
+
+      submissions = data || [];
+
+      submissions = submissions.map((item) => ({
+        ...item,
+        pdf_status: normalizeReadyStatus(item.pdf_status),
+        csv_status: normalizeReadyStatus(item.csv_status),
+        replay_status: normalizeReadyStatus(item.replay_status)
+      }));
+
+      selectedId = selectedId || submissions[0]?.id || null;
+
+      renderStats();
+      renderList();
+      renderDetail();
+    }
+
+    async function initAdmin() {
+      const { data } = await supabaseClient.auth.getSession();
+      currentUser = data.session?.user ?? null;
+
+      if (!currentUser) {
+        alert("로그인이 필요한 페이지입니다.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      if (!ADMIN_EMAILS.includes(currentUser.email)) {
+        alert("관리자만 접근할 수 있습니다.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      authNavLink.textContent = "로그아웃";
+      await loadSubmissions();
+    }
+
+    authNavLink.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      const { error } = await supabaseClient.auth.signOut();
+
+      if (error) {
+        alert("로그아웃 중 오류가 발생했습니다.");
+        return;
+      }
+
+      alert("로그아웃되었습니다.");
+      window.location.href = "index.html";
+    });
+
+    searchInput.addEventListener("input", renderList);
+    statusFilter.addEventListener("change", renderList);
+
+    initAdmin();
+  </script>
+</body>
+</html>

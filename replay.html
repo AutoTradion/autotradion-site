@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoTradion | Replay</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
+
+    body {
+      background: #050a0f;
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(5, 10, 15, 0.92);
+      border-bottom: 1px solid #1e2a36;
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-inner {
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00e5ff, #0077ff);
+      box-shadow: 0 0 24px rgba(0, 229, 255, 0.35);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      font-size: 14px;
+      color: #d6e2ef;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover {
+      color: #00e5ff;
+    }
+
+    .section {
+      padding: 80px 0;
+    }
+
+    .section-title {
+      font-size: clamp(34px, 4vw, 54px);
+      line-height: 1.06;
+      letter-spacing: -0.05em;
+      margin-bottom: 22px;
+    }
+
+    .section-copy {
+      color: #a9b7c6;
+      font-size: 16px;
+      max-width: 760px;
+    }
+
+    .ticker {
+      background: #111a24;
+      border-top: 1px solid #1f2d3a;
+      border-bottom: 1px solid #1f2d3a;
+      padding: 28px 0;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .ticker span {
+      display: inline-block;
+      padding-left: 0;
+      white-space: pre;
+    }
+
+    .footer {
+      padding: 70px 0;
+      background: #060b10;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .footer p,
+    .footer a {
+      color: #9fb0c0;
+      font-size: 14px;
+    }
+
+    .socials {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .social-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #101821;
+      border: 1px solid #263544;
+      color: #00e5ff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .contact {
+      text-align: right;
+    }
+
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.68);
+      backdrop-filter: blur(10px);
+    }
+
+    .auth-modal.active {
+      display: flex;
+    }
+
+    .auth-box {
+      width: min(420px, 100%);
+      background: #101821;
+      border: 1px solid #00e5ff;
+      border-radius: 22px;
+      padding: 34px;
+      box-shadow: 0 0 40px rgba(0, 229, 255, 0.16);
+      position: relative;
+    }
+
+    .auth-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid #263544;
+      background: #060b10;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .auth-box h2 {
+      font-size: 30px;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin-bottom: 10px;
+    }
+
+    .auth-box p {
+      color: #9fb0c0;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .auth-tab {
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid #263544;
+      background: #060b10;
+      color: #9fb0c0;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .auth-tab.active {
+      border-color: #00e5ff;
+      color: #001018;
+      background: #00e5ff;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .auth-form input {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      border: 1px solid #263544;
+      background: #060b10;
+      color: #ffffff;
+      padding: 0 14px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .auth-submit {
+      height: 48px;
+      border: 0;
+      border-radius: 999px;
+      background: #00e5ff;
+      color: #001018;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .auth-message {
+      min-height: 20px;
+      margin-top: 14px;
+      color: #9fb8cf;
+      font-size: 13px;
+    }
+
+    .replay-hero {
+      padding: 90px 0 42px;
+      text-align: center;
+    }
+
+    .replay-hero h1 {
+      font-size: clamp(44px, 5vw, 68px);
+      line-height: 1.02;
+      letter-spacing: -0.06em;
+      margin-bottom: 22px;
+    }
+
+    .replay-hero p {
+      color: #a9b7c6;
+      font-size: 17px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .replay-shell {
+      background: #101821;
+      border: 1px solid #243241;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+
+    .chart-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .chart-title h2 {
+      font-size: 26px;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+    }
+
+    .chart-title p {
+      color: #9fb0c0;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .chart-stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: #060b10;
+      border: 1px solid #263544;
+      color: #d6e2ef;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .chart-wrap {
+      width: 100%;
+      height: 620px;
+      position: relative;
+      background: #071323;
+      border: 1px solid #203040;
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: grab;
+    }
+
+    .chart-wrap.dragging {
+      cursor: grabbing;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .signal-info {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      width: min(360px, calc(100% - 36px));
+      background: rgba(6, 11, 16, 0.94);
+      border: 1px solid #00e5ff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 0 32px rgba(0, 229, 255, 0.14);
+      display: none;
+      z-index: 5;
+    }
+
+    .signal-info.active {
+      display: block;
+    }
+
+    .signal-info h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .signal-info p {
+      color: #a9b7c6;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .signal-close {
+      margin-top: 14px;
+      min-height: 34px;
+      padding: 0 14px;
+      border: 1px solid #263544;
+      border-radius: 999px;
+      background: transparent;
+      color: #d6e2ef;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .control-panel {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      min-height: 44px;
+      min-width: 96px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid #263544;
+      background: #060b10;
+      color: #d6e2ef;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .control-btn:hover {
+      border-color: #00e5ff;
+      color: #00e5ff;
+      transform: translateY(-2px);
+    }
+
+    .control-btn.primary {
+      background: #00e5ff;
+      color: #001018;
+      border-color: #00e5ff;
+    }
+
+    .control-btn.primary:hover {
+      background: #55efff;
+      color: #001018;
+    }
+
+    .hint-box {
+      margin-top: 16px;
+      color: #8fa3b5;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contact {
+        text-align: left;
+      }
+
+      .socials {
+        justify-content: flex-start;
+      }
+
+      .chart-wrap {
+        height: 520px;
+      }
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <div class="page">
+    <header class="navbar">
+      <div class="container nav-inner">
+        <a class="logo" href="index.html" aria-label="AutoTradion Home">
+          <span class="logo-mark"></span>
+          <span>AutoTradion</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="index.html#why-autotradion">소개</a>
+          <a href="submit.html" data-protected="true">전략 제출</a>
+          <a href="mypage.html" data-protected="true">마이 페이지</a>
+          <a href="index.html#cases">성공 사례</a>
+          <a href="index.html#products">상품</a>
+          <a href="index.html#contact">문의</a>
+          <a href="#" id="authNavLink">로그인</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="replay-hero">
+        <div class="container">
+          <h1>백테스트 리플레이</h1>
+          <p>
+            전략 시그널이 실제 차트 흐름에서 어떤 위치에 발생했는지 캔들 단위로 재생하며 확인합니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="section" style="padding-top: 40px;">
+        <div class="container">
+          <div class="replay-shell">
+            <div class="chart-topbar">
+              <div class="chart-title">
+                <h2 id="chartName">BTCUSDT · 1H</h2>
+                <p id="chartDesc">CSV 캔들 데이터를 기반으로 리플레이를 구성합니다.</p>
+              </div>
+
+              <div class="chart-stats">
+                <div class="stat-pill" id="candleCounter">0 / 0</div>
+                <div class="stat-pill" id="speedLabel">1x</div>
+                <div class="stat-pill">Mouse Wheel: Zoom</div>
+              </div>
+            </div>
+
+            <div class="chart-wrap" id="chartWrap">
+              <canvas id="replayCanvas"></canvas>
+
+              <div class="signal-info" id="signalInfo">
+                <h3 id="signalTitle">Signal</h3>
+                <p id="signalReason">-</p>
+                <button class="signal-close" id="signalClose" type="button">닫기</button>
+              </div>
+            </div>
+
+            <div class="control-panel">
+              <button class="control-btn" id="prevBtn" type="button">이전 캔들</button>
+              <button class="control-btn primary" id="playBtn" type="button">재생</button>
+              <button class="control-btn" id="nextBtn" type="button">다음 캔들</button>
+              <button class="control-btn" id="speedBtn" type="button">배속 1x</button>
+              <button class="control-btn" id="resetBtn" type="button">초기화</button>
+            </div>
+
+            <div class="hint-box">
+              차트 드래그: 이동 · 마우스 휠: 확대/축소 · 시그널 클릭: 진입 근거 확인
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="ticker" aria-hidden="true">
+        <span>로직 정밀도        •        실시간 백테스트        •        전문 보고서        •        자동매매 구성        •        자동신호 프로그램        •        전략 분석</span>
+      </div>
+    </main>
+
+    <footer class="footer" id="contact">
+      <div class="container footer-grid">
+        <div>
+          <a class="logo" href="index.html">
+            <span class="logo-mark"></span>
+            <span>AutoTradion</span>
+          </a>
+          <p style="margin-top: 28px;">Trade Smarter, Analyze Faster</p>
+          <p style="margin-top: 34px;">© 2026 AutoTradion. All rights reserved.</p>
+        </div>
+
+        <div class="socials" aria-label="Social links">
+          <a class="social-dot" href="#">F</a>
+          <a class="social-dot" href="#">I</a>
+          <a class="social-dot" href="#">Y</a>
+          <a class="social-dot" href="#">X</a>
+          <a class="social-dot" href="#">IN</a>
+        </div>
+
+        <div class="contact">
+          <p>contact@autotradion.io</p>
+          <p style="margin-top: 26px;">서울, 한국</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div class="auth-modal" id="authModal" aria-hidden="true">
+    <div class="auth-box">
+      <button class="auth-close" id="authClose" type="button" aria-label="Close login modal">×</button>
+
+      <h2 id="authTitle">로그인</h2>
+      <p id="authDesc">AutoTradion 서비스를 이용하려면 로그인이 필요합니다.</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="loginTab" type="button">로그인</button>
+        <button class="auth-tab" id="signupTab" type="button">회원가입</button>
+      </div>
+
+      <form class="auth-form" id="authForm">
+        <input id="authEmail" type="email" placeholder="이메일" autocomplete="email" required />
+        <input id="authPassword" type="password" placeholder="비밀번호" autocomplete="current-password" required />
+        <button class="auth-submit" id="authSubmit" type="submit">로그인</button>
+      </form>
+
+      <div class="auth-message" id="authMessage"></div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://ygcwsnvwwadprfagxyqv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable__yFeMAX8nVt3Ul3TbsaiIw_oQh0_XSZ";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const authModal = document.getElementById("authModal");
+    const authClose = document.getElementById("authClose");
+    const authNavLink = document.getElementById("authNavLink");
+    const loginTab = document.getElementById("loginTab");
+    const signupTab = document.getElementById("signupTab");
+    const authTitle = document.getElementById("authTitle");
+    const authDesc = document.getElementById("authDesc");
+    const authForm = document.getElementById("authForm");
+    const authEmail = document.getElementById("authEmail");
+    const authPassword = document.getElementById("authPassword");
+    const authSubmit = document.getElementById("authSubmit");
+    const authMessage = document.getElementById("authMessage");
+
+    let authMode = "login";
+    let currentUser = null;
+
+    function openAuthModal(message = "") {
+      authModal.classList.add("active");
+      authModal.setAttribute("aria-hidden", "false");
+      authMessage.textContent = message;
+      setTimeout(() => authEmail.focus(), 50);
+    }
+
+    function closeAuthModal() {
+      authModal.classList.remove("active");
+      authModal.setAttribute("aria-hidden", "true");
+      authMessage.textContent = "";
+      authForm.reset();
+    }
+
+    function setAuthMode(mode) {
+      authMode = mode;
+      const isLogin = mode === "login";
+
+      loginTab.classList.toggle("active", isLogin);
+      signupTab.classList.toggle("active", !isLogin);
+
+      authTitle.textContent = isLogin ? "로그인" : "회원가입";
+      authDesc.textContent = isLogin
+        ? "AutoTradion 서비스를 이용하려면 로그인이 필요합니다."
+        : "이메일과 비밀번호로 AutoTradion 계정을 생성합니다.";
+      authSubmit.textContent = isLogin ? "로그인" : "회원가입";
+      authMessage.textContent = "";
+    }
+
+    function updateAuthUI(user) {
+      currentUser = user;
+
+      if (user) {
+        authNavLink.textContent = "로그아웃";
+        authNavLink.href = "#logout";
+      } else {
+        authNavLink.textContent = "로그인";
+        authNavLink.href = "#login";
+      }
+    }
+
+    async function initAuth() {
+      const { data } = await supabaseClient.auth.getSession();
+      updateAuthUI(data.session?.user ?? null);
+
+      if (!data.session?.user) {
+        alert("로그인이 필요한 서비스입니다. 로그인 후 이용해 주세요.");
+        window.location.href = "index.html";
+      }
+    }
+
+    loginTab.addEventListener("click", () => setAuthMode("login"));
+    signupTab.addEventListener("click", () => setAuthMode("signup"));
+    authClose.addEventListener("click", closeAuthModal);
+
+    authModal.addEventListener("click", (e) => {
+      if (e.target === authModal) closeAuthModal();
+    });
+
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = authEmail.value.trim();
+      const password = authPassword.value.trim();
+
+      if (!email || !password) {
+        authMessage.textContent = "이메일과 비밀번호를 입력해 주세요.";
+        return;
+      }
+
+      authSubmit.disabled = true;
+      authSubmit.textContent = authMode === "login" ? "로그인 중..." : "가입 중...";
+      authMessage.textContent = "";
+
+      try {
+        if (authMode === "login") {
+          const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          updateAuthUI(data.user);
+          closeAuthModal();
+          alert("로그인되었습니다.");
+        } else {
+          const { data, error } = await supabaseClient.auth.signUp({ email, password });
+          if (error) throw error;
+
+          if (data.user && data.session) {
+            updateAuthUI(data.user);
+            closeAuthModal();
+            alert("회원가입이 완료되었습니다.");
+          } else {
+            authMessage.textContent = "회원가입이 완료되었습니다. 이메일 인증을 확인해 주세요.";
+          }
+        }
+      } catch (error) {
+        authMessage.textContent = error.message || "처리 중 오류가 발생했습니다.";
+      } finally {
+        authSubmit.disabled = false;
+        authSubmit.textContent = authMode === "login" ? "로그인" : "회원가입";
+      }
+    });
+
+    authNavLink.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      if (currentUser) {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) {
+          alert("로그아웃 중 오류가 발생했습니다.");
+          return;
+        }
+        updateAuthUI(null);
+        alert("로그아웃되었습니다.");
+        window.location.href = "index.html";
+      } else {
+        setAuthMode("login");
+        openAuthModal();
+      }
+    });
+
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
+      updateAuthUI(session?.user ?? null);
+    });
+
+    initAuth();
+  </script>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const STRATEGY_ID = urlParams.get("id");
+
+    let CSV_FILE = "candles.csv";
+    const SYMBOL = "BTCUSDT";
+    const TIMEFRAME = "1H";
+    const INITIAL_VISIBLE = 80;
+    const MAX_CANDLES = 420;
+
+    const canvas = document.getElementById("replayCanvas");
+    const ctx = canvas.getContext("2d");
+    const chartWrap = document.getElementById("chartWrap");
+    const playBtn = document.getElementById("playBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const speedBtn = document.getElementById("speedBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const candleCounter = document.getElementById("candleCounter");
+    const speedLabel = document.getElementById("speedLabel");
+    const chartName = document.getElementById("chartName");
+    const signalInfo = document.getElementById("signalInfo");
+    const signalTitle = document.getElementById("signalTitle");
+    const signalReason = document.getElementById("signalReason");
+    const signalClose = document.getElementById("signalClose");
+
+    let candles = [];
+    let signals = [];
+    let currentIndex = INITIAL_VISIBLE;
+    let isPlaying = false;
+    let timer = null;
+    let speedList = [1, 2, 4, 8];
+    let speedIndex = 0;
+    let barWidth = 9;
+    let offsetX = 0;
+    let pricePaddingRatio = 0.08;
+    let isDragging = false;
+    let hasDragged = false;
+    let dragStartX = 0;
+    let dragStartOffset = 0;
+    let signalHitboxes = [];
+
+    function resizeCanvas() {
+      const rect = chartWrap.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawChart();
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const headers = lines[0].split(",").map((h) => h.trim());
+
+      return lines.slice(1).map((line) => {
+        const cols = line.split(",");
+        const row = {};
+        headers.forEach((header, index) => {
+          row[header] = cols[index];
+        });
+
+        return {
+          time: row.start_time || row.time || row.datetime || row.date,
+          open: Number(row.open),
+          high: Number(row.high),
+          low: Number(row.low),
+          close: Number(row.close),
+          volume: Number(row.volume || 0),
+        };
+      }).filter((c) => Number.isFinite(c.open) && Number.isFinite(c.high) && Number.isFinite(c.low) && Number.isFinite(c.close));
+    }
+
+    function createMockSignals() {
+      signals = [
+        {
+          index: Math.min(110, candles.length - 1),
+          type: "LONG",
+          reason: "가격이 단기 하락 구조를 마감한 뒤 RSI 과매도 구간에서 반등 조건을 충족했습니다.",
+        },
+        {
+          index: Math.min(185, candles.length - 1),
+          type: "SHORT",
+          reason: "상단 변동성 구간에서 종가 저항이 확인되고 추세 약화 조건이 발생했습니다. MVP 예시용 임의 시그널입니다.",
+        },
+        {
+          index: Math.min(280, candles.length - 1),
+          type: "LONG",
+          reason: "이전 저점 방어 이후 거래량 회복과 함께 롱 진입 조건이 충족된 것으로 가정했습니다. MVP 예시용 임의 시그널입니다.",
+        },
+      ].filter((s) => s.index > 0);
+    }
+
+    async function loadReplayFileFromSupabase() {
+      if (!STRATEGY_ID) return;
+
+      const { data, error } = await supabaseClient
+        .from("strategy_submissions")
+        .select("strategy_name, market, trade_type, replay_candles_url, replay_logic_code")
+        .eq("id", STRATEGY_ID)
+        .single();
+
+      if (error || !data) {
+        console.error(error);
+        alert("리플레이 정보를 불러오지 못했습니다.");
+        return;
+      }
+
+      if (!data.replay_candles_url) {
+        alert("등록된 리플레이 캔들 파일이 없습니다.");
+        return;
+      }
+
+      const { data: signedData, error: signedError } = await supabaseClient.storage
+        .from("strategy-files")
+        .createSignedUrl(data.replay_candles_url, 60 * 10);
+
+      if (signedError || !signedData?.signedUrl) {
+        console.error(signedError);
+        alert("리플레이 캔들 파일 URL 생성에 실패했습니다.");
+        return;
+      }
+
+      CSV_FILE = signedData.signedUrl;
+
+      chartName.textContent = `${data.strategy_name || "Replay"} · ${data.market || ""} · ${data.trade_type || ""}`;
+    }
+
+
+
+    async function loadCandles() {
+      try {
+        const response = await fetch(CSV_FILE);
+        if (!response.ok) throw new Error("CSV 파일을 불러오지 못했습니다.");
+        const text = await response.text();
+        candles = parseCSV(text).slice(0, MAX_CANDLES);
+
+        if (candles.length < INITIAL_VISIBLE) {
+          currentIndex = candles.length - 1;
+        }
+
+        createMockSignals();
+        updateUI();
+        resizeCanvas();
+      } catch (error) {
+        alert("리플레이 캔들 데이터를 불러오지 못했습니다.");
+        console.error(error);
+      }
+    }
+
+    function getVisibleRange() {
+      const width = chartWrap.clientWidth;
+      const visibleCount = Math.max(20, Math.floor(width / barWidth));
+      const replayEnd = Math.min(currentIndex + 1, candles.length);
+      const panBars = Math.round(offsetX / barWidth);
+      let shiftedEnd = replayEnd - panBars;
+
+      shiftedEnd = Math.max(1, Math.min(replayEnd, shiftedEnd));
+
+      const start = Math.max(0, shiftedEnd - visibleCount);
+      const end = shiftedEnd;
+
+      return { start, end };
+    }
+
+    function getPriceRange(visibleCandles) {
+      let min = Math.min(...visibleCandles.map((c) => c.low));
+      let max = Math.max(...visibleCandles.map((c) => c.high));
+      const pad = (max - min) * pricePaddingRatio;
+      return { min: min - pad, max: max + pad };
+    }
+
+    function priceToY(price, min, max, height, topPad, bottomPad) {
+      return topPad + ((max - price) / (max - min)) * (height - topPad - bottomPad);
+    }
+
+    function drawGrid(width, height) {
+      ctx.strokeStyle = "rgba(255,255,255,0.055)";
+      ctx.lineWidth = 1;
+
+      for (let x = 0; x < width; x += 72) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y < height; y += 58) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+    }
+
+    function formatTimeLabel(value) {
+      if (!value) return "";
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return String(value).slice(0, 10);
+      }
+
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hour = String(date.getHours()).padStart(2, "0");
+
+      return `${month}-${day} ${hour}:00`;
+    }
+
+    function drawPriceAxis(min, max, width, height, topPad, bottomPad, rightPad) {
+      const axisX = width - rightPad;
+      ctx.strokeStyle = "rgba(255,255,255,0.16)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(axisX, 0);
+      ctx.lineTo(axisX, height - bottomPad + 10);
+      ctx.stroke();
+
+      ctx.fillStyle = "#8fa3b5";
+      ctx.font = "12px Arial";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+
+      const steps = 6;
+      for (let i = 0; i <= steps; i++) {
+        const ratio = i / steps;
+        const price = max - (max - min) * ratio;
+        const y = topPad + ratio * (height - topPad - bottomPad);
+
+        ctx.strokeStyle = "rgba(255,255,255,0.05)";
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(axisX, y);
+        ctx.stroke();
+
+        ctx.fillText(price.toFixed(1), axisX + 8, y);
+      }
+    }
+
+    function drawTimeAxis(visible, start, startX, candleStep, height, bottomPad, candleAreaWidth) {
+      const axisY = height - bottomPad + 12;
+
+      ctx.strokeStyle = "rgba(255,255,255,0.16)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, axisY);
+      ctx.lineTo(candleAreaWidth, axisY);
+      ctx.stroke();
+
+      ctx.fillStyle = "#8fa3b5";
+      ctx.font = "12px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+
+      const labelCount = 6;
+      const step = Math.max(1, Math.floor(visible.length / labelCount));
+
+      for (let i = 0; i < visible.length; i += step) {
+        const x = startX + i * candleStep + candleStep / 2;
+        if (x < 40 || x > candleAreaWidth - 40) continue;
+
+        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+        ctx.beginPath();
+        ctx.moveTo(x, axisY);
+        ctx.lineTo(x, axisY + 5);
+        ctx.stroke();
+
+        ctx.fillText(formatTimeLabel(visible[i].time), x, axisY + 8);
+      }
+    }
+
+    function drawChart() {
+      const width = chartWrap.clientWidth;
+      const height = chartWrap.clientHeight;
+
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#071323";
+      ctx.fillRect(0, 0, width, height);
+      drawGrid(width, height);
+
+      if (!candles.length) return;
+
+      const { start, end } = getVisibleRange();
+      const visible = candles.slice(start, end);
+      if (!visible.length) return;
+
+      const { min, max } = getPriceRange(visible);
+      const topPad = 26;
+      const bottomPad = 54;
+      const rightPad = 82;
+      const candleAreaWidth = width - rightPad;
+      const candleStep = barWidth;
+      const bodyWidth = Math.max(3, candleStep * 0.58);
+      const startX = candleAreaWidth - visible.length * candleStep;
+
+      signalHitboxes = [];
+
+      drawPriceAxis(min, max, width, height, topPad, bottomPad, rightPad);
+      drawTimeAxis(visible, start, startX, candleStep, height, bottomPad, candleAreaWidth);
+
+      visible.forEach((candle, i) => {
+        const globalIndex = start + i;
+        const x = startX + i * candleStep + candleStep / 2;
+        const openY = priceToY(candle.open, min, max, height, topPad, bottomPad);
+        const highY = priceToY(candle.high, min, max, height, topPad, bottomPad);
+        const lowY = priceToY(candle.low, min, max, height, topPad, bottomPad);
+        const closeY = priceToY(candle.close, min, max, height, topPad, bottomPad);
+        const isUp = candle.close >= candle.open;
+        const color = isUp ? "#00e5ff" : "#ff6b6b";
+
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.moveTo(x, highY);
+        ctx.lineTo(x, lowY);
+        ctx.stroke();
+
+        const bodyTop = Math.min(openY, closeY);
+        const bodyHeight = Math.max(2, Math.abs(closeY - openY));
+        ctx.fillRect(x - bodyWidth / 2, bodyTop, bodyWidth, bodyHeight);
+
+        const signal = signals.find((s) => s.index === globalIndex && s.index <= currentIndex);
+        if (signal) {
+          drawSignal(signal, x, signal.type === "LONG" ? lowY + 24 : highY - 24);
+        }
+      });
+
+      const last = candles[Math.min(currentIndex, candles.length - 1)];
+      if (last) {
+        const lastY = priceToY(last.close, min, max, height, topPad, bottomPad);
+        ctx.strokeStyle = "rgba(0,229,255,0.45)";
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(0, lastY);
+        ctx.lineTo(width - rightPad, lastY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = "#00e5ff";
+        ctx.fillRect(width - rightPad + 6, lastY - 12, 62, 24);
+        ctx.fillStyle = "#001018";
+        ctx.font = "bold 12px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(last.close.toFixed(1), width - rightPad + 37, lastY + 4);
+      }
+    }
+
+    function drawSignal(signal, x, y) {
+      const isLong = signal.type === "LONG";
+      const color = isLong ? "#7dff73" : "#ff6b6b";
+      const label = isLong ? "LONG" : "SHORT";
+
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      if (isLong) {
+        ctx.moveTo(x, y - 13);
+        ctx.lineTo(x - 10, y + 7);
+        ctx.lineTo(x + 10, y + 7);
+      } else {
+        ctx.moveTo(x, y + 13);
+        ctx.lineTo(x - 10, y - 7);
+        ctx.lineTo(x + 10, y - 7);
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.font = "bold 11px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(label, x, isLong ? y + 22 : y - 16);
+
+      signalHitboxes.push({
+        x: x - 26,
+        y: y - 26,
+        w: 52,
+        h: 52,
+        signal,
+      });
+    }
+
+    function updateUI() {
+      candleCounter.textContent = `${Math.min(currentIndex + 1, candles.length)} / ${candles.length}`;
+      speedLabel.textContent = `${speedList[speedIndex]}x`;
+      speedBtn.textContent = `배속 ${speedList[speedIndex]}x`;
+      playBtn.textContent = isPlaying ? "정지" : "재생";
+    }
+
+    function stepForward() {
+      if (currentIndex < candles.length - 1) {
+        currentIndex += 1;
+        updateUI();
+        drawChart();
+      } else {
+        stopReplay();
+      }
+    }
+
+    function stepBackward() {
+      currentIndex = Math.max(INITIAL_VISIBLE, currentIndex - 1);
+      updateUI();
+      drawChart();
+    }
+
+    function startReplay() {
+      if (isPlaying) return;
+      isPlaying = true;
+      updateUI();
+      const interval = 700 / speedList[speedIndex];
+      timer = setInterval(stepForward, interval);
+    }
+
+    function stopReplay() {
+      isPlaying = false;
+      if (timer) clearInterval(timer);
+      timer = null;
+      updateUI();
+    }
+
+    playBtn.addEventListener("click", () => {
+      if (isPlaying) stopReplay();
+      else startReplay();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      stopReplay();
+      stepBackward();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      stopReplay();
+      stepForward();
+    });
+
+    speedBtn.addEventListener("click", () => {
+      speedIndex = (speedIndex + 1) % speedList.length;
+      if (isPlaying) {
+        stopReplay();
+        startReplay();
+      }
+      updateUI();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      stopReplay();
+      currentIndex = Math.min(INITIAL_VISIBLE, candles.length - 1);
+      offsetX = 0;
+      barWidth = 9;
+      pricePaddingRatio = 0.08;
+      signalInfo.classList.remove("active");
+      updateUI();
+      drawChart();
+    });
+
+    signalClose.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    signalInfo.classList.remove("active");
+    });
+
+    signalInfo.addEventListener("pointerdown", (e) => {
+    e.stopPropagation();
+    });
+
+    signalInfo.addEventListener("click", (e) => {
+    e.stopPropagation();
+    });
+
+    chartWrap.addEventListener("pointerdown", (e) => {
+      isDragging = true;
+      hasDragged = false;
+      dragStartX = e.clientX;
+      dragStartOffset = offsetX;
+      chartWrap.classList.add("dragging");
+      chartWrap.setPointerCapture(e.pointerId);
+    });
+
+    chartWrap.addEventListener("pointermove", (e) => {
+      if (!isDragging) return;
+
+      const moved = e.clientX - dragStartX;
+      if (Math.abs(moved) > 3) hasDragged = true;
+
+      offsetX = dragStartOffset + moved;
+      drawChart();
+    });
+
+    chartWrap.addEventListener("pointerup", (e) => {
+      isDragging = false;
+      chartWrap.classList.remove("dragging");
+      chartWrap.releasePointerCapture(e.pointerId);
+    });
+
+    chartWrap.addEventListener("pointercancel", () => {
+      isDragging = false;
+      chartWrap.classList.remove("dragging");
+    });
+
+    chartWrap.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      const direction = e.deltaY > 0 ? -1 : 1;
+      barWidth = Math.min(24, Math.max(4, barWidth + direction));
+      drawChart();
+    }, { passive: false });
+
+    chartWrap.addEventListener("click", (e) => {
+      if (hasDragged) {
+        hasDragged = false;
+        return;
+      }
+
+      const rect = chartWrap.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const hit = signalHitboxes.find((box) => {
+        return x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h;
+      });
+
+      if (!hit) return;
+
+      signalTitle.textContent = hit.signal.type === "LONG" ? "Long Signal" : "Short Signal";
+      signalReason.textContent = hit.signal.reason;
+      signalInfo.classList.add("active");
+    });
+
+    window.addEventListener("resize", resizeCanvas);
+
+    async function initReplay() {
+      await loadReplayFileFromSupabase();
+      await loadCandles();
+    }
+
+    initReplay();
+  </script>
+</body>
+</html>
